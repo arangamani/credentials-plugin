@@ -30,6 +30,7 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import hudson.DescriptorExtensionList;
 import hudson.ExtensionList;
 import hudson.ExtensionPoint;
+import hudson.model.Api;
 import hudson.model.Descriptor;
 import hudson.model.Hudson;
 import hudson.model.Item;
@@ -41,6 +42,8 @@ import hudson.security.PermissionGroup;
 import hudson.security.PermissionScope;
 import jenkins.model.Jenkins;
 import org.acegisecurity.Authentication;
+import org.kohsuke.stapler.export.Exported;
+import org.kohsuke.stapler.export.ExportedBean;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,6 +59,7 @@ import java.util.logging.Logger;
 /**
  * An extension point for providing {@link Credentials}.
  */
+@ExportedBean
 public abstract class CredentialsProvider implements ExtensionPoint {
 
     /**
@@ -112,6 +116,11 @@ public abstract class CredentialsProvider implements ExtensionPoint {
      */
     public static final Permission MANAGE_DOMAINS = new Permission(GROUP, "ManageDomains",
             Messages._CredentialsProvider_ManageDomainsPermissionDescription(), Permission.CONFIGURE, PermissionScope.JENKINS);
+
+
+    public Api getApi() {
+        return new Api(this);
+    }
 
     /**
      * Returns all the registered {@link com.cloudbees.plugins.credentials.Credentials} descriptors.
@@ -178,6 +187,7 @@ public abstract class CredentialsProvider implements ExtensionPoint {
      * @since 1.5
      */
     @NonNull
+    @Exported
     public <C extends Credentials> List<C> getCredentials(@NonNull Class<C> type,
                                                           @Nullable ItemGroup itemGroup,
                                                           @Nullable Authentication authentication,
@@ -215,6 +225,7 @@ public abstract class CredentialsProvider implements ExtensionPoint {
      * @since 1.5
      */
     @NonNull
+    @Exported
     public <C extends Credentials> List<C> getCredentials(@NonNull Class<C> type,
                                                           @NonNull Item item,
                                                           @Nullable Authentication authentication,

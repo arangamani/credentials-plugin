@@ -33,6 +33,7 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import hudson.DescriptorExtensionList;
 import hudson.Extension;
 import hudson.XmlFile;
+import hudson.model.Api;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
 import hudson.model.Hudson;
@@ -53,6 +54,8 @@ import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.HttpResponses;
 import org.kohsuke.stapler.StaplerProxy;
 import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.export.Exported;
+import org.kohsuke.stapler.export.ExportedBean;
 
 import javax.servlet.ServletException;
 import java.io.File;
@@ -78,6 +81,7 @@ import static com.cloudbees.plugins.credentials.CredentialsScope.SYSTEM;
  * The root store of credentials.
  */
 @Extension
+@ExportedBean
 public class SystemCredentialsProvider extends ManagementLink
         implements Describable<SystemCredentialsProvider>, Saveable, StaplerProxy {
 
@@ -118,6 +122,10 @@ public class SystemCredentialsProvider extends ManagementLink
         }
         domainCredentialsMap = DomainCredentials.migrateListToMap(domainCredentialsMap, credentials);
         credentials = null;
+    }
+
+    public Api getApi() {
+        return new Api(this);
     }
 
     /**
@@ -301,6 +309,7 @@ public class SystemCredentialsProvider extends ManagementLink
      * Implementation for {@link StoreImpl} to delegate to while keeping the lock synchronization simple.
      */
     @NonNull
+    @Exported
     private synchronized List<Credentials> getCredentials(@NonNull Domain domain) {
         if (Jenkins.getInstance().hasPermission(CredentialsProvider.VIEW)) {
             List<Credentials> list = getDomainCredentialsMap().get(domain);
